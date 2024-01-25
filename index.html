@@ -3,51 +3,76 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="favicon.png" type="image/x-icon">
   <title>Media Player</title>
-  <!-- Bootstrap Icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
-
+  <link rel="icon" href="favicon.png" type="image/x-icon">
+  <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 </head>
 <body>
-  <div class="container">
-    <div class="panel">
-      <div class="header">
-        <label for="file-input" style="cursor: pointer;">
+  <div class="app container">
+    <div class="header">
+      <div class="title">
+        <img src="logo.png">
+        <p>Media Player</p>
+      </div>
+      <div class="menu">
+        <label class="file-input">
           <i class="bi bi-file-earmark-play-fill"></i>
           Open File
+          <input type="file" accept="audio/*,video/*" class="hidden" oninput="openFile(this.files[0])" />
         </label>
-        <input type="file" id="file-input" accept="audio/*,video/*" onchange="playMedia()" style="display: none;" />
+
+        <label class="folder-input">
+          <i class="bi bi-folder"></i>
+          Open Folder
+          <input type="file" accept="audio/*,video/*" class="hidden" oninput="openFiles(this.files)" webkitdirectory directory multiple>
+        </label>
+
+        <label class="background-input">
+          <i class="bi bi-image"></i>
+          Background
+          <input type="file" accept="image/*" class="hidden" oninput="updateBackground(this.files[0])" />
+        </label>
       </div>
-     
-      <div class="media-container" onclick="pauseMedia()">
-        <img src="logo.png" class="icon">
-        <audio id="audio-player" style="display: none;"></audio>
-        <video id="video-player" style="display: none;"></video>
+    </div>
+   
+    <div class="media-container">
+      <img src="logo.png" class="icon">
+      <img class="background hidden">
+      <audio id="audio-player" class="hidden"></audio>
+      <video id="video-player" class="hidden"></video>
+    </div>
+  
+    <div class="controls">
+      <div class="progress-bar">
+        <input type="range" class="slider" oninput="seekTo(this.value)" onchange="updatePauseBtn()" value="0">
       </div>
-    
-      <div class="controls" style="display: none;">
-        <div class="progress-bar">
-          <input type="range" class="slider" oninput="seek(this.value)" onchange="updatePauseBtn()" value="0">
-        </div>
-        <div class="bottom">
-          <button class="pause tooltip" onclick="pauseMedia()">
-            <i class="bi bi-pause-fill"></i>
-            <div class="tooltip-text">Pause (k)</div>
-          </button>
-          <button class="replay tooltip" onclick="replayMedia()">
-            <i class="bi bi-arrow-counterclockwise"></i>
-            <div class="tooltip-text">Replay</div>
-          </button>
-          <div class="volume">
-            <span>Volume: </span>
-            <button class="decrease" onclick="increaseVolume(-0.05)">-</button>
-            <span class="value">0</span>
-            <button class="increase" onclick="increaseVolume(0.05)">+</button>
+      <div class="bottom">
+        <button class="pause tooltip" onclick="pause()">
+          <i class="bi bi-pause-fill"></i>
+          <div class="tooltip-text">Pause (k)</div>
+        </button>
+        
+        <button class="replay tooltip" onclick="replay()">
+          <i class="bi bi-arrow-counterclockwise"></i>
+          <div class="tooltip-text">Replay (r)</div>
+        </button>
+
+        <div class="volume">
+          <div class="icon-container" onclick="mute()">
+            <i class="bi bi-volume-down-fill"></i>
           </div>
+          <button class="decrease" onclick="increaseVolume(-0.05)">-</button>
+          <span class="value">0</span>
+          <button class="increase" onclick="increaseVolume(0.05)">+</button>
         </div>
+
+        <button class="fullscreen tooltip" onclick="toggleFullscreen()">
+          <i class="bi bi-fullscreen"></i>
+          <div class="tooltip-text">Fullscreen (f)</div>
+        </button>
+
       </div>
     </div>
   </div>

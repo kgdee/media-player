@@ -1,13 +1,22 @@
-/* Google Fonts */
+/*==================== GOOGLE FONTS ====================*/
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+/*==================== BOOTSTRAP ICONS ====================*/
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css");
 
+
+:root {
+  --primary-color: #fff;
+  --background-color: #333;
+}
 
 * {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
   outline: none;
+  -webkit-tap-highlight-color: transparent;
+  border: none;
+  text-decoration: none;
   line-height: 1;
 }
 
@@ -34,9 +43,13 @@ button {
   display: block;
 }
 
+.hidden {
+  display: none !important;
+}
+
 body {
   font-family: 'Poppins', sans-serif;
-  background-color: #333;
+  background-color: var(--background-color);
   color: white;
   font-size: 0.8rem;
 }
@@ -48,7 +61,7 @@ body {
 }
 
 
-.panel {
+.app {
   overflow: hidden;
   width: 100vw;
   height: 100vh;
@@ -56,12 +69,29 @@ body {
   flex-direction: column;
 }
 
-.panel .header {
+.app .header {
+  position: relative;
+  z-index: 2;
+  background-color: var(--background-color);
   padding: 5px;
 }
 
-.panel .title {
-  margin-bottom: 5px;
+.app .title {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.app .title img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.app .menu {
+  display: flex;
+  gap: 5px;
 }
 
 .media-container {
@@ -84,7 +114,20 @@ body {
   width: 64px;
 }
 
+.media-container .background {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
 .controls {
+  position: relative;
+  z-index: 2;
+  background-color: var(--background-color);
   padding: 5px;
 }
 
@@ -102,14 +145,44 @@ body {
   gap: 10px;
 }
 
+.controls button {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
 .controls .volume {
   display: flex;
   align-items: center;
   gap: 5px;
 }
 
-.controls button {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
+.controls .volume .icon-container {
+  font-size: 1.25rem;
+}
+
+
+
+@keyframes musicBeat {
+  0% {
+    transform: scale(1.1) translate(0, 0);
+  }
+  20% {
+    transform: scale(1.1) translate(2px, -2px);
+  }
+  35% {
+    transform: scale(1.1025) translate(-1px, -1px);
+  }
+  50% {
+    transform: scale(1.1) translate(1px, -1px);
+  }
+  65% {
+    transform: scale(1.105) translate(3px, 1px);
+  }
+  80% {
+    transform: scale(1.1) translate(1px, -1px);
+  }
+  100% {
+    transform: scale(1.1) translate(0, 0);
+  }
 }

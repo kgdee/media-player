@@ -5,8 +5,8 @@ const audioPlayer = document.getElementById("audio-player")
 const videoPlayer = document.getElementById("video-player")
 const players = [audioPlayer, videoPlayer]
 
-const fileInput = document.getElementById("file-input")
-
+const backgroundEl = document.querySelector(".media-container .background")
+const appTitle = document.querySelector(".app .title p")
 const controls = document.querySelector(".controls")
 const progressBar = document.querySelector(".progress-bar .slider")
 const pauseBtn = document.querySelector(".controls .pause")
@@ -14,14 +14,17 @@ const pauseBtn = document.querySelector(".controls .pause")
 const volumeDisplay = document.querySelector(".controls .volume .value")
 
 let volume = parseFloat(localStorage.getItem(storagePrefix + "volume")) || 0.5
+let muted = JSON.parse(localStorage.getItem(storagePrefix + "muted")) || false
+let background = localStorage.getItem(storagePrefix + "background") || null
 
 let fileType = null
 
+let currentFiles = []
+let currentFile = null
 
-function playMedia() {
-  const file = fileInput.files[0]
 
-  if (!file) return
+function openFile(file) {
+  currentFile = file
 
   fileType = file.type.split("/")[0]
 
@@ -29,45 +32,58 @@ function playMedia() {
 
   const url = URL.createObjectURL(file)
 
-  // if old player exists
+  
   if (player) player.pause()
 
   switch (fileType) {
     case "audio":
       player = audioPlayer
-      videoPlayer.style.display = 'none'
+      videoPlayer.classList.add("hidden")
       break
     case "video":
       player = videoPlayer
-      audioPlayer.style.display = 'none'
+      audioPlayer.classList.add("hidden")
       break
     default:
       break
   }
 
-  player.style.display = "block"
+  appTitle.textContent = currentFile.name
+  player.classList.remove("hidden")
   player.src = url
   player.play()
 
-  controls.style.display = "block"
+  controls.classList.remove("hidden")
   document.title = file.name + " - Media Player"
 }
 
-function pauseMedia() {
+function openFiles(files) {
+  if (files) currentFiles = files
+  if (!currentFiles) return
+
+  const newFiles = Array.from(currentFiles).filter(item => item !== currentFile)
+  currentFile = newFiles[Math.floor(Math.random() * newFiles.length)]
+  openFile(currentFile)
+}
+
+
+function pause() {
   if (!player) return
 
   const ended = player.currentTime >= player.duration - 0.1
 
   if (!ended) player.paused ? player.play() : player.pause() 
   else {
-    replayMedia()
+    replay()
     return
   }
 
   updatePauseBtn()
 }
 
-function replayMedia() {
+function replay() {
+  if (!player) return
+
   player.currentTime = 0
   player.play()
 
@@ -92,16 +108,29 @@ function updatePauseBtn() {
   }
 }
 
-function increaseVolume(value) {
-  if ((value > 0 && volume + value > 1) || (value < 0 && volume + value < 0)) return
-  volume += value
-  player.volume = volume
+function increaseVolume(amount) {
+  if ((amount > 0 && volume + amount > 1) || (amount < 0 && volume + amount < 0)) return
+
+  volume += amount
+  if (player) player.volume = volume
   localStorage.setItem(storagePrefix + "volume", volume.toString())
   updateVolumeDisplay()
 }
 
 function updateVolumeDisplay() {
   volumeDisplay.textContent = Math.round(volume * 100)
+
+  let icon = muted ? `<i class="bi bi-volume-mute-fill"></i>` : `<i class="bi bi-volume-down-fill"></i>`
+  document.querySelector(".controls .volume .icon-container").innerHTML = icon
+}
+
+function mute() {
+  muted = !muted
+  if (player) player.muted = muted
+  
+  localStorage.setItem(storagePrefix + "muted", muted.toString())
+
+  updateVolumeDisplay()
 }
 
 function updateProgressBar() {
@@ -110,22 +139,64 @@ function updateProgressBar() {
   progressBar.value = player.currentTime
 }
 
-function seek(value) {
-  player.currentTime = value
+function seekTo(time) {
+  player.currentTime = time
 }
 
+
+function readFile(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+      resolve(e.target.result);
+    };
+
+    reader.onerror = function (error) {
+      reject(error);
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
+async function updateBackground(file) {
+  const url = file ? await readFile(file) : background
+
+  if (url) {
+    backgroundEl.classList.remove("hidden")
+    backgroundEl.src = url
+  } else {
+    backgroundEl.src = null
+    backgroundEl.classList.add("hidden")
+  }
+
+  if (url && (url !== background)) localStorage.setItem(storagePrefix + "background", url)
+}
+
+function toggleFullscreen() {
+  if (document.fullscreenElement) {
+    document.exitFullscreen();
+  } else {
+    document.querySelector(".media-container").requestFullscreen();
+  }
+}
 
 
 document.addEventListener("keydown", function(event) {
   if (player) {
-    if (event.key === 'k') pauseMedia()
+    if (event.code === 'KeyK') pause()
+    if (event.code === 'KeyR') replay()
 
-    if (event.key === 'j' || event.key === 'ArrowLeft') player.currentTime -= 5
-    if (event.key === 'l' || event.key === 'ArrowRight') player.currentTime += 5
-  
-    if (event.key === 'ArrowDown') increaseVolume(-0.05)
-    if (event.key === 'ArrowUp') increaseVolume(0.05)
+    if (event.code === 'KeyJ' || event.key === 'ArrowLeft') player.currentTime -= 5
+    if (event.code === 'KeyL' || event.key === 'ArrowRight') player.currentTime += 5
   }
+
+  if (event.code === 'KeyM') mute()
+  if (event.key === 'ArrowDown') increaseVolume(-0.05)
+  if (event.key === 'ArrowUp') increaseVolume(0.05)
+
+  if (event.code === 'KeyF') toggleFullscreen()
 })
 
 
@@ -133,8 +204,29 @@ document.addEventListener("keydown", function(event) {
 players.forEach(player => {
   player.addEventListener('loadedmetadata', function() {
     player.volume = volume
+    player.muted = muted
     updateVolumeDisplay()
   });
   player.addEventListener("timeupdate", updateProgressBar)
-  player.addEventListener("ended", updatePauseBtn)
+  
+  player.addEventListener("play", function() {
+    backgroundEl.style.animation = "musicBeat 2s infinite"
+  })
+  
+  player.addEventListener("pause", function() {
+    backgroundEl.style.animation = null
+  })
+
+  player.addEventListener('ended', () => {
+    if (currentFiles.length > 1) {
+      openFiles()
+    } else
+      updatePauseBtn()
+  });
+
+})
+
+document.addEventListener("DOMContentLoaded", function() {
+  updateVolumeDisplay()
+  updateBackground()
 })
