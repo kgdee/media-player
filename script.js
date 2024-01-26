@@ -22,6 +22,8 @@ let fileType = null
 let currentFiles = []
 let currentFile = null
 
+let animationInterval = null
+let animated = false
 
 function openFile(file) {
   currentFile = file
@@ -183,6 +185,27 @@ function toggleFullscreen() {
 }
 
 
+function startAnimation() {
+  animated = true
+  clearInterval(animationInterval)
+  animationInterval = setInterval(animation, 500)
+}
+
+function stopAnimation() {
+  animated = false
+  clearInterval(animationInterval)
+}
+
+function animation() {
+  const x = Math.random() * 10 - 5
+  const y = Math.random() * 10 - 5
+  const scale = 1 + (Math.random() * 0.05)
+
+  backgroundEl.style.transform = `translate(${x}px, ${y}px) scale(${scale})`
+}
+
+
+
 document.addEventListener("keydown", function(event) {
   if (player) {
     if (event.code === 'KeyK') pause()
@@ -210,11 +233,11 @@ players.forEach(player => {
   player.addEventListener("timeupdate", updateProgressBar)
   
   player.addEventListener("play", function() {
-    backgroundEl.style.animation = "musicBeat 2s infinite"
+    startAnimation()
   })
   
   player.addEventListener("pause", function() {
-    backgroundEl.style.animation = null
+    stopAnimation()
   })
 
   player.addEventListener('ended', () => {
