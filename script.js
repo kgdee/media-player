@@ -197,11 +197,11 @@ function stopAnimation() {
 }
 
 function animation() {
-  const x = Math.random() * 12 - 6
-  const y = Math.random() * 12 - 6
-  const scale = 1 + (Math.random() * 0.01)
+  const x = (Math.random() * 0.8) - 0.4
+  const y = (Math.random() * 0.8) - 0.4
+  const scale = 1.01 + (Math.random() * 0.01)
 
-  backgroundEl.style.transform = `translate(${x}px, ${y}px) scale(${scale})`
+  backgroundEl.style.transform = `translate(${x}%, ${y}%) scale(${scale})`
 }
 
 
