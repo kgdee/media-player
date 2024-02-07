@@ -20,14 +20,12 @@ let background = localStorage.getItem(storagePrefix + "background") || null
 let fileType = null
 
 let currentFiles = []
-let currentFile = null
+let availableFiles = []
 
 let animationInterval = null
 let animated = false
 
 function openFile(file) {
-  currentFile = file
-
   fileType = file.type.split("/")[0]
 
   if (fileType != "audio" && fileType != "video") return
@@ -50,7 +48,7 @@ function openFile(file) {
       break
   }
 
-  appTitle.textContent = currentFile.name
+  appTitle.textContent = file.name
   player.classList.remove("hidden")
   player.src = url
   player.play()
@@ -60,12 +58,16 @@ function openFile(file) {
 }
 
 function openFiles(files) {
-  if (files) currentFiles = files
+  if (files) currentFiles = [...files]
   if (!currentFiles) return
 
-  const newFiles = Array.from(currentFiles).filter(item => item !== currentFile)
-  currentFile = newFiles[Math.floor(Math.random() * newFiles.length)]
-  openFile(currentFile)
+  if (availableFiles.length <= 0) availableFiles = [...currentFiles]
+
+  const fileIndex = Math.floor(Math.random() * availableFiles.length)
+  const file = availableFiles[fileIndex]
+  availableFiles.splice(fileIndex, 1)
+
+  openFile(file)
 }
 
 
