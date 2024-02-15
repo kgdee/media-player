@@ -20,13 +20,13 @@
         <label class="file-input">
           <i class="bi bi-file-earmark-play-fill"></i>
           Open File
-          <input type="file" accept="audio/*,video/*" class="hidden" oninput="openFile(this.files[0])" />
+          <input type="file" accept="audio/*,video/*" class="hidden" oninput="openFile(this.files[0])" multiple>
         </label>
 
         <label class="folder-input">
           <i class="bi bi-folder"></i>
           Open Folder
-          <input type="file" accept="audio/*,video/*" class="hidden" oninput="openFiles(this.files)" multiple>
+          <input type="file" accept="audio/*,video/*" class="hidden" oninput="openFiles(this.files)" webkitdirectory directory multiple>
         </label>
         <!-- 
         <label class="subtitle-input">
@@ -37,15 +37,15 @@
 
         <label class="background-input">
           <i class="bi bi-image"></i>
-          Background
-          <input type="file" accept="image/*" class="hidden" oninput="updateBackground(this.files[0])" />
+          Cover
+          <input type="file" accept="image/*" class="hidden" oninput="updateCover(this.files[0])" />
         </label>
       </div>
     </div>
    
     <div class="media-container">
       <img src="logo.png" class="icon">
-      <img class="background hidden">
+      <img class="cover hidden">
       <audio id="audio-player" class="hidden"></audio>
       <video id="video-player" class="hidden"></video>
     </div>
@@ -58,6 +58,18 @@
         <button class="pause tooltip" onclick="pause()">
           <i class="bi bi-pause-fill"></i>
           <div class="tooltip-text">Pause (k)</div>
+        </button>
+        
+        <button class="skip-b" onclick="skip(false)">
+          <i class="bi bi-skip-backward-fill"></i>
+        </button>
+        
+        <button class="stop" onclick="stop()">
+          <i class="bi bi-stop-fill"></i>
+        </button>
+        
+        <button class="skip-f" onclick="skip(true)">
+          <i class="bi bi-skip-forward-fill"></i>
         </button>
         
         <button class="replay tooltip" onclick="replay()">

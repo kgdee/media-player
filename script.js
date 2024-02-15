@@ -5,7 +5,7 @@ const audioPlayer = document.getElementById("audio-player")
 const videoPlayer = document.getElementById("video-player")
 const players = [audioPlayer, videoPlayer]
 
-const backgroundEl = document.querySelector(".media-container .background")
+const coverEl = document.querySelector(".media-container .cover")
 const appTitle = document.querySelector(".app .title p")
 const controls = document.querySelector(".controls")
 const progressBar = document.querySelector(".progress-bar .slider")
@@ -15,17 +15,26 @@ const volumeDisplay = document.querySelector(".controls .volume .value")
 
 let volume = parseFloat(localStorage.getItem(storagePrefix + "volume")) || 0.5
 let muted = JSON.parse(localStorage.getItem(storagePrefix + "muted")) || false
-let background = localStorage.getItem(storagePrefix + "background") || null
+let cover = localStorage.getItem(storagePrefix + "cover") || null
 
 let fileType = null
 
 let currentFiles = []
+let currentFile = null
 let availableFiles = []
+let historyFiles = []
+let backwardCount = 0
 
 let animationInterval = null
 let animated = false
 
-function openFile(file) {
+function openFile(file, options = { useHistory: true }) {
+  
+  if (!file) return
+
+  const fileMatch = currentFiles.some(item => item.name === file.name) 
+  if (fileMatch) file = currentFiles[currentFiles.findIndex(item => item.name === file.name)]
+
   fileType = file.type.split("/")[0]
 
   if (fileType != "audio" && fileType != "video") return
@@ -53,6 +62,18 @@ function openFile(file) {
   player.src = url
   player.play()
 
+  const fileIndex = currentFiles.indexOf(file)
+  currentFile = fileIndex
+
+  if (options.useHistory) {
+    if (historyFiles.length > 0 && backwardCount > 0) historyFiles.splice((historyFiles.length - backwardCount), 0, fileIndex)
+    else historyFiles.push(fileIndex)
+  }
+ 
+  if (fileMatch) {
+    if (availableFiles.includes(fileIndex)) availableFiles.splice(availableFiles.indexOf(fileIndex), 1)
+  }
+
   controls.classList.remove("hidden")
   document.title = file.name + " - Media Player"
 }
@@ -61,11 +82,12 @@ function openFiles(files) {
   if (files) currentFiles = [...files]
   if (!currentFiles) return
 
-  if (availableFiles.length <= 0) availableFiles = [...currentFiles]
+  backwardCount = 0
 
-  const fileIndex = Math.floor(Math.random() * availableFiles.length)
-  const file = availableFiles[fileIndex]
-  availableFiles.splice(fileIndex, 1)
+  if (availableFiles.length <= 0) availableFiles = Array.from({ length: currentFiles.length }, (_, index) => index)
+  
+  const fileIndex = availableFiles[Math.floor(Math.random() * availableFiles.length)]
+  const file = currentFiles[fileIndex]
 
   openFile(file)
 }
@@ -81,8 +103,6 @@ function pause() {
     replay()
     return
   }
-
-  updatePauseBtn()
 }
 
 function replay() {
@@ -90,11 +110,11 @@ function replay() {
 
   player.currentTime = 0
   player.play()
-
-  updatePauseBtn()
 }
 
 function updatePauseBtn() {
+  if (!player) return
+
   const ended = player.currentTime >= player.duration - 0.1
   if (!ended) {
     pauseBtn.innerHTML = player.paused ? `
@@ -137,6 +157,38 @@ function mute() {
   updateVolumeDisplay()
 }
 
+function skip(forward = true) {
+  let file = null
+  if (forward) {
+    if (backwardCount > 0) {
+      backwardCount--
+      file = currentFiles[historyFiles[historyFiles.length - backwardCount - 1]]
+    } else {
+      backwardCount = 0
+      openFiles()
+      return
+    }
+  } else if (historyFiles.length > backwardCount + 1) {
+    backwardCount++
+    file = currentFiles[historyFiles[historyFiles.length - backwardCount - 1]]
+  } else {
+    console.log("minimum limit!")
+  }
+
+  // console.log(backwardCount)
+
+  const useHistory = backwardCount <= 0 && historyFiles[historyFiles.length - 1] !== currentFiles.indexOf(file)
+  
+  openFile(file, { useHistory: useHistory })
+}
+
+function stop() {
+  if (!player) return
+
+  player.pause()
+  player.currentTime = 0
+}
+
 function updateProgressBar() {
   progressBar.min = 0
   progressBar.max = player.duration
@@ -144,6 +196,8 @@ function updateProgressBar() {
 }
 
 function seekTo(time) {
+  if (!player) return
+
   player.currentTime = time
 }
 
@@ -164,18 +218,18 @@ function readFile(file) {
   });
 }
 
-async function updateBackground(file) {
-  const url = file ? await readFile(file) : background
+async function updateCover(file) {
+  const url = file ? await readFile(file) : cover
 
   if (url) {
-    backgroundEl.classList.remove("hidden")
-    backgroundEl.src = url
+    coverEl.classList.remove("hidden")
+    coverEl.src = url
   } else {
-    backgroundEl.src = null
-    backgroundEl.classList.add("hidden")
+    coverEl.src = ""
+    coverEl.classList.add("hidden")
   }
 
-  if (url && (url !== background)) localStorage.setItem(storagePrefix + "background", url)
+  if (url && (url !== cover)) localStorage.setItem(storagePrefix + "cover", url)
 }
 
 function toggleFullscreen() {
@@ -203,14 +257,14 @@ function animation() {
   const y = (Math.random() * 0.8) - 0.4
   const scale = 1.01 + (Math.random() * 0.01)
 
-  backgroundEl.style.transform = `translate(${x}%, ${y}%) scale(${scale})`
+  coverEl.style.transform = `translate(${x}%, ${y}%) scale(${scale})`
 }
 
 
 
 document.addEventListener("keydown", function(event) {
   if (player) {
-    if (event.code === 'KeyK') pause()
+    if (event.key === " " || event.code === 'KeyK') pause()
     if (event.code === 'KeyR') replay()
 
     if (event.code === 'KeyJ' || event.key === 'ArrowLeft') player.currentTime -= 5
@@ -231,15 +285,18 @@ players.forEach(player => {
     player.volume = volume
     player.muted = muted
     updateVolumeDisplay()
+    updatePauseBtn()
   });
   player.addEventListener("timeupdate", updateProgressBar)
   
   player.addEventListener("play", function() {
     startAnimation()
+    updatePauseBtn()
   })
   
   player.addEventListener("pause", function() {
     stopAnimation()
+    updatePauseBtn()
   })
 
   player.addEventListener('ended', () => {
@@ -253,5 +310,12 @@ players.forEach(player => {
 
 document.addEventListener("DOMContentLoaded", function() {
   updateVolumeDisplay()
-  updateBackground()
+  updateCover()
 })
+
+
+window.addEventListener("error", (event) => {
+  const error = `${event.type}: ${event.message}`
+  console.error(error)
+  alert(error)
+});
