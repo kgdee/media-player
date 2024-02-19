@@ -28,6 +28,8 @@ let backwardCount = 0
 let animationInterval = null
 let animated = false
 
+var isMobile = /iPhone|iPad|iPod|Android|BlackBerry|Windows Phone/i.test(navigator.userAgent)
+
 function openFile(file, options = { useHistory: true }) {
   
   if (!file) return
@@ -79,7 +81,20 @@ function openFile(file, options = { useHistory: true }) {
 }
 
 function openFiles(files) {
-  if (files) currentFiles = [...files]
+  if (!files) return
+  if (files.length <= 0) return
+
+  if (files.length <= 1) {
+    openFile(files[0])
+    return
+  }
+
+  currentFiles = [...files]
+ 
+  openRandomFile()
+}
+
+function openRandomFile() {
   if (!currentFiles) return
 
   backwardCount = 0
@@ -165,14 +180,14 @@ function skip(forward = true) {
       file = currentFiles[historyFiles[historyFiles.length - backwardCount - 1]]
     } else {
       backwardCount = 0
-      openFiles()
+      openRandomFile()
       return
     }
   } else if (historyFiles.length > backwardCount + 1) {
     backwardCount++
     file = currentFiles[historyFiles[historyFiles.length - backwardCount - 1]]
   } else {
-    console.log("minimum limit!")
+    // console.log("minimum limit!")
   }
 
   // console.log(backwardCount)
@@ -301,7 +316,7 @@ players.forEach(player => {
 
   player.addEventListener('ended', () => {
     if (currentFiles.length > 1) {
-      openFiles()
+      openRandomFile()
     } else
       updatePauseBtn()
   });
@@ -309,6 +324,7 @@ players.forEach(player => {
 })
 
 document.addEventListener("DOMContentLoaded", function() {
+  if (isMobile) document.querySelector(".folder-input").classList.add("hidden")
   updateVolumeDisplay()
   updateCover()
 })
