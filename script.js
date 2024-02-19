@@ -28,7 +28,7 @@ let backwardCount = 0
 let animationInterval = null
 let animated = false
 
-var isMobile = /iPhone|iPad|iPod|Android|BlackBerry|Windows Phone/i.test(navigator.userAgent)
+const isMobile = /iPhone|iPad|iPod|Android|BlackBerry|Windows Phone/i.test(navigator.userAgent)
 
 function openFile(file, options = { useHistory: true }) {
   
@@ -148,9 +148,8 @@ function updatePauseBtn() {
 }
 
 function increaseVolume(amount) {
-  if ((amount > 0 && volume + amount > 1) || (amount < 0 && volume + amount < 0)) return
+  volume = Math.min(Math.max(volume + amount, 0), 1)
 
-  volume += amount
   if (player) player.volume = volume
   localStorage.setItem(storagePrefix + "volume", volume.toString())
   updateVolumeDisplay()
