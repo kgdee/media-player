@@ -286,7 +286,7 @@ document.addEventListener("keydown", function(event) {
   }
 
   if (event.code === 'KeyM') mute()
-  if (event.key === 'ArrowDown') increaseVolume(volume > 5 ? -0.05 : -0.01)
+  if (event.key === 'ArrowDown') increaseVolume(-0.05)
   if (event.key === 'ArrowUp') increaseVolume(0.05)
 
   if (event.code === 'KeyF') toggleFullscreen()
