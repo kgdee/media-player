@@ -1,0 +1,164 @@
+/*==================== GOOGLE FONTS ====================*/
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --primary-color: #fff;
+  --background-color: #333;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  border: none;
+  text-decoration: none;
+  line-height: 1;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+}
+
+.tooltip {
+  position: relative;
+}
+
+.tooltip .tooltip-text {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 5px);
+  padding: 1px;
+  background-color: rgba(0, 0, 0, 0.75);
+  color: white;
+  text-wrap: nowrap;
+}
+
+.tooltip:hover .tooltip-text {
+  display: block;
+}
+
+.hidden {
+  display: none !important;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--background-color);
+  color: white;
+  font-size: 0.8rem;
+}
+
+
+.container {
+  max-width: 1440px;
+  margin: auto;
+}
+
+
+.app {
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app .header {
+  position: relative;
+  z-index: 2;
+  background-color: var(--background-color);
+  padding: 5px;
+}
+
+.app .title {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.app .title img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.app .menu {
+  display: flex;
+  gap: 10px;
+}
+
+.app .menu > * {
+  font-size: 1rem;
+}
+
+.media-container {
+  position: relative;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  background-color: black;
+}
+
+.media-container > * {
+  position: relative;
+}
+
+.media-container .icon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 64px;
+}
+
+.media-container .cover {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: 1s;
+}
+
+.controls {
+  position: relative;
+  z-index: 2;
+  background-color: var(--background-color);
+  padding: 5px;
+}
+
+.controls .progress-bar {
+  width: 100%;
+  margin-bottom: 5px;
+}
+
+.controls .progress-bar .slider {
+  width: 100%;
+}
+
+.controls .bottom {
+  display: flex;
+  gap: 10px;
+}
+
+.controls button {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+}
+
+.controls .volume {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.controls .volume .icon-container {
+  font-size: 1.25rem;
+}
