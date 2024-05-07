@@ -160,7 +160,7 @@ function changeVolume(isIncrease) {
   if (volume < 5 && amount > 0) amount = 1
 
   volume = Math.min(Math.max(volume + amount, 0), 100)
-
+  
   if (player) player.volume = volume / 100
   localStorage.setItem(storagePrefix + "volume", volume.toString())
   updateVolumeDisplay()
@@ -327,7 +327,7 @@ document.addEventListener("keydown", function(event) {
 
 players.forEach(player => {
   player.addEventListener('loadedmetadata', function() {
-    player.volume = volume
+    player.volume = volume / 100
     player.muted = muted
     updateVolumeDisplay()
     updatePauseBtn()
