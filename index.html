@@ -82,9 +82,9 @@
           <div class="icon-container" onclick="mute()">
             <i class="bi bi-volume-down-fill"></i>
           </div>
-          <button class="decrease" onclick="increaseVolume(-0.05)">-</button>
+          <button class="decrease" onclick="changeVolume(false)">-</button>
           <span class="value">0</span>
-          <button class="increase" onclick="increaseVolume(0.05)">+</button>
+          <button class="increase" onclick="changeVolume(true)">+</button>
         </div>
           
         <button class="repeat tooltip" onclick="toggleRepeat()">

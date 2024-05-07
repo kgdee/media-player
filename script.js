@@ -14,9 +14,11 @@ const pauseBtn = document.querySelector(".controls .pause")
 const volumeDisplay = document.querySelector(".controls .volume .value")
 const repeatBtn = document.querySelector(".controls .repeat")
 
-let volume = parseFloat(localStorage.getItem(storagePrefix + "volume")) || 0.5
+let volume = parseInt(localStorage.getItem(storagePrefix + "volume"))
+if (isNaN(volume)) volume = 50
+
 let muted = JSON.parse(localStorage.getItem(storagePrefix + "muted")) || false
-let repeat = false
+let repeatEnabled = false
 let cover = localStorage.getItem(storagePrefix + "cover") || null
 
 let fileType = null
@@ -151,16 +153,21 @@ function updatePauseBtn() {
   }
 }
 
-function increaseVolume(amount) {
-  volume = Math.min(Math.max(volume + amount, 0), 1)
+function changeVolume(isIncrease) {
+  let amount = isIncrease ? 5 : -5
+  
+  if (volume <= 5 && amount < 0) amount = -1
+  if (volume < 5 && amount > 0) amount = 1
 
-  if (player) player.volume = volume
+  volume = Math.min(Math.max(volume + amount, 0), 100)
+
+  if (player) player.volume = volume / 100
   localStorage.setItem(storagePrefix + "volume", volume.toString())
   updateVolumeDisplay()
 }
 
 function updateVolumeDisplay() {
-  volumeDisplay.textContent = Math.round(volume * 100)
+  volumeDisplay.textContent = volume
 
   let icon = muted ? `<i class="bi bi-volume-mute-fill"></i>` : `<i class="bi bi-volume-down-fill"></i>`
   document.querySelector(".controls .volume .icon-container").innerHTML = icon
@@ -176,11 +183,11 @@ function mute() {
 }
 
 function toggleRepeat() {
-  repeat = !repeat
+  repeatEnabled = !repeatEnabled
 
   repeatBtn.innerHTML = `
-    <i class="bi bi-repeat${repeat ? "-1" : ""}"></i>
-    <div class="tooltip-text">Repeat ${repeat ? "on" : "off"}</div>
+    <i class="bi bi-repeat${repeatEnabled ? "-1" : ""}"></i>
+    <div class="tooltip-text">Repeat ${repeatEnabled ? "on" : "off"}</div>
   `
 }
 
@@ -269,6 +276,15 @@ function toggleFullscreen() {
   }
 }
 
+function repeat() {
+  if (repeatTimeout) cancelRepeat()
+
+  repeatTimeout = setTimeout(replay, 2000)
+}
+
+function cancelRepeat() {
+  clearTimeout(repeatTimeout)
+}
 
 function startAnimation() {
   animated = true
@@ -301,8 +317,8 @@ document.addEventListener("keydown", function(event) {
   }
 
   if (event.code === 'KeyM') mute()
-  if (event.key === 'ArrowDown') increaseVolume(-0.05)
-  if (event.key === 'ArrowUp') increaseVolume(0.05)
+  if (event.key === 'ArrowDown') changeVolume(false)
+  if (event.key === 'ArrowUp') changeVolume(true)
 
   if (event.code === 'KeyF') toggleFullscreen()
 })
@@ -320,7 +336,7 @@ players.forEach(player => {
   
   player.addEventListener("play", function() {
     
-    if (repeatTimeout) clearTimeout(repeatTimeout)
+    if (repeatTimeout) cancelRepeat()
     startAnimation()
     updatePauseBtn()
   })
@@ -332,12 +348,12 @@ players.forEach(player => {
 
   player.addEventListener('ended', () => {
 
-    if (!repeat) {
+    if (!repeatEnabled) {
       
       currentFiles.length > 1 ? openRandomFile() : updatePauseBtn()
     } else {
 
-     repeatTimeout = setTimeout(replay, 2000)
+     repeat()
     }
   });
 
