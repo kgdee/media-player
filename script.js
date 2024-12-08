@@ -13,7 +13,7 @@ const pauseBtn = document.querySelector(".controls .pause")
 
 const volumeDisplay = document.querySelector(".controls .volume .value")
 const repeatBtn = document.querySelector(".controls .repeat")
-const speedBtn = document.querySelector(".controls .speed")
+const rateBtn = document.querySelector(".controls .rate")
 
 let volume = parseInt(localStorage.getItem(storagePrefix + "volume"))
 let playbackRate = 1
@@ -240,11 +240,11 @@ function seekTo(time) {
 
 function changePlaybackRate() {
 
-  playbackRate = playbackRate === 1 ? 0.5 : 1
+  playbackRate = playbackRate === 1 ? 0.75 : 1
 
   if (player) player.playbackRate = playbackRate
 
-  speedBtn.innerHTML = `
+  rateBtn.innerHTML = `
   ${playbackRate}x
   <div class="tooltip-text">Playback speed ${playbackRate}x</div>
   `
