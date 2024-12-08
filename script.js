@@ -13,8 +13,10 @@ const pauseBtn = document.querySelector(".controls .pause")
 
 const volumeDisplay = document.querySelector(".controls .volume .value")
 const repeatBtn = document.querySelector(".controls .repeat")
+const speedBtn = document.querySelector(".controls .speed")
 
 let volume = parseInt(localStorage.getItem(storagePrefix + "volume"))
+let playbackRate = 1
 if (isNaN(volume)) volume = 50
 
 let muted = JSON.parse(localStorage.getItem(storagePrefix + "muted")) || false
@@ -34,7 +36,6 @@ let animated = false
 
 let repeatTimeout = null
 
-const isMobile = /iPhone|iPad|iPod|Android|BlackBerry|Windows Phone/i.test(navigator.userAgent)
 
 function openFile(file, options = { useHistory: true }) {
   
@@ -237,6 +238,19 @@ function seekTo(time) {
   if (player.paused) player.play()
 }
 
+function changePlaybackRate() {
+
+  playbackRate = playbackRate === 1 ? 0.5 : 1
+
+  if (player) player.playbackRate = playbackRate
+
+  speedBtn.innerHTML = `
+  ${playbackRate}x
+  <div class="tooltip-text">Playback speed ${playbackRate}x</div>
+  `
+}
+
+
 
 function readFile(file) {
   return new Promise((resolve, reject) => {
@@ -329,6 +343,7 @@ players.forEach(player => {
   player.addEventListener('loadedmetadata', function() {
     player.volume = volume / 100
     player.muted = muted
+    player.playbackRate = playbackRate
     updateVolumeDisplay()
     updatePauseBtn()
   });
@@ -360,7 +375,6 @@ players.forEach(player => {
 })
 
 document.addEventListener("DOMContentLoaded", function() {
-  if (isMobile) document.querySelector(".folder-input").classList.add("hidden")
   updateVolumeDisplay()
   updateCover()
 })

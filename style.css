@@ -162,3 +162,19 @@ body {
 .controls .volume .icon-container {
   font-size: 1.25rem;
 }
+
+
+
+
+/* Medium screens (Tablets, up to 768px wide) */
+@media (max-width: 768px) {
+  
+}
+
+/* Small screens (Phones, up to 480px wide) */
+@media (max-width: 480px) {
+  
+  .folder-input, .controls .fullscreen {
+    display: none;
+  }
+}
