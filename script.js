@@ -319,8 +319,8 @@ document.addEventListener("keydown", function (event) {
     if (event.key === " " || event.code === "KeyK") pause();
     if (event.code === "KeyR") replay();
 
-    if (event.code === "KeyJ" || event.key === "ArrowLeft") player.currentTime -= 5;
-    if (event.code === "KeyL" || event.key === "ArrowRight") player.currentTime += 5;
+    if (event.code === "KeyA" || event.key === "ArrowLeft") player.currentTime -= 5;
+    if (event.code === "KeyD" || event.key === "ArrowRight") player.currentTime += 5;
   }
 
   if (event.code === "KeyM") mute();
