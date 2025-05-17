@@ -314,6 +314,18 @@ function animation() {
   coverEl.style.transform = `translate(${x}%, ${y}%) scale(${scale})`;
 }
 
+function switchMenu() {
+  const buttonsEl = document.querySelectorAll(".controls .buttons");
+
+  buttonsEl.forEach((el) => {
+    el.classList.toggle("active");
+  });
+}
+
+function toggleHeaderMenu() {
+  document.querySelector(".header").classList.toggle("expanded");
+}
+
 document.addEventListener("keydown", function (event) {
   if (player) {
     if (event.key === " " || event.code === "KeyK") pause();

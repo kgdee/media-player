@@ -1,109 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Media Player</title>
-  <link rel="icon" href="favicon.png" type="image/x-icon">
-  <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
-  <link href="bootstrap-icons-1.11.3/bootstrap-icons.css" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <script src="script.js" defer></script>
-</head>
-<body>
-  <div class="app container">
-    <div class="header">
-      <div class="title">
-        <img src="logo.png">
-        <p>Media Player</p>
-      </div>
-      <div class="menu">
-        <label class="file-input">
-          <i class="bi bi-file-earmark-play-fill"></i>
-          Open File
-          <input type="file" accept="audio/*,video/*" class="hidden" oninput="openFiles(this.files)" multiple>
-        </label>
-
-        <label class="folder-input">
-          <i class="bi bi-folder"></i>
-          Open Folder
-          <input type="file" accept="audio/*,video/*" class="hidden" oninput="openFiles(this.files)" webkitdirectory directory multiple>
-        </label>
-        <!-- 
-        <label class="subtitle-input">
-          <i class="bi bi-badge-cc"></i>
-          Add Subtitle
-          <input type="file" accept="image/*" class="hidden" oninput="" />
-        </label> -->
-
-        <label class="background-input">
-          <i class="bi bi-image"></i>
-          Cover
-          <input type="file" accept="image/*" class="hidden" oninput="updateCover(this.files[0])" />
-        </label>
-      </div>
-    </div>
-   
-    <div class="media-container">
-      <img src="logo.png" class="icon">
-      <img class="cover hidden">
-      <audio id="audio-player" class="hidden"></audio>
-      <video id="video-player" class="hidden"></video>
-    </div>
-  
-    <div class="controls">
-      <div class="progress-bar">
-        <input type="range" class="slider" oninput="seekTo(this.value)" onchange="updatePauseBtn()" value="0">
-      </div>
-      <div class="bottom">
-        <button class="pause tooltip" onclick="pause()">
-          <i class="bi bi-pause-fill"></i>
-          <div class="tooltip-text">Pause (k)</div>
-        </button>
-        
-        <button class="skip-b" onclick="skip(false)">
-          <i class="bi bi-skip-backward-fill"></i>
-        </button>
-        
-        <button class="stop" onclick="stop()">
-          <i class="bi bi-stop-fill"></i>
-        </button>
-        
-        <button class="skip-f" onclick="skip(true)">
-          <i class="bi bi-skip-forward-fill"></i>
-        </button>
-        
-        <button class="replay tooltip" onclick="replay()">
-          <i class="bi bi-arrow-counterclockwise"></i>
-          <div class="tooltip-text">Replay (r)</div>
-        </button>
-
-        <div class="volume">
-          <div class="icon-container" onclick="mute()">
-            <i class="bi bi-volume-down-fill"></i>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Media Player</title>
+    <link rel="icon" href="favicon.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+    <link href="bootstrap-icons-1.11.3/bootstrap-icons.css" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <div class="app container">
+      <div class="header">
+        <div class="top">
+          <div class="title">
+            <img src="logo.png" />
+            <p>Media Player</p>
           </div>
-          <button class="decrease" onclick="changeVolume(false)">-</button>
-          <span class="value">0</span>
-          <button class="increase" onclick="changeVolume(true)">+</button>
+          <button class="toggle" onclick="toggleHeaderMenu()">
+            <i class="bi bi-list"></i>
+          </button>
         </div>
-          
-        <button class="repeat tooltip" onclick="toggleRepeat()">
-          <i class="bi bi-repeat"></i>
-          <div class="tooltip-text">Repeat off</div>
-        </button>
+        <div class="menu">
+          <label class="file-input">
+            <i class="bi bi-file-earmark-play-fill"></i>
+            Open File
+            <input type="file" accept="audio/*,video/*" class="hidden" oninput="openFiles(this.files)" multiple />
+          </label>
 
-        <button class="rate tooltip" onclick="changePlaybackRate()">
-          1x
-          <div class="tooltip-text">Playback speed</div>
-        </button>
+          <label class="folder-input">
+            <i class="bi bi-folder"></i>
+            Open Folder
+            <input type="file" accept="audio/*,video/*" class="hidden" oninput="openFiles(this.files)" webkitdirectory directory multiple />
+          </label>
+          <!-- 
+          <label class="subtitle-input">
+            <i class="bi bi-badge-cc"></i>
+            Add Subtitle
+            <input type="file" accept="image/*" class="hidden" oninput="" />
+          </label> -->
 
-        <button class="fullscreen tooltip" onclick="toggleFullscreen()">
-          <i class="bi bi-fullscreen"></i>
-          <div class="tooltip-text">Fullscreen (f)</div>
-        </button>
+          <label class="background-input">
+            <i class="bi bi-image"></i>
+            Cover
+            <input type="file" accept="image/*" class="hidden" oninput="updateCover(this.files[0])" />
+          </label>
+        </div>
+      </div>
 
+      <div class="media-container">
+        <img src="logo.png" class="icon" />
+        <img class="cover hidden" />
+        <audio id="audio-player" class="hidden"></audio>
+        <video id="video-player" class="hidden"></video>
+      </div>
+
+      <div class="controls">
+        <div class="progress-bar">
+          <input type="range" class="slider" oninput="seekTo(this.value)" onchange="updatePauseBtn()" value="0" />
+        </div>
+        <div class="options">
+          <button class="pause tooltip" onclick="pause()">
+            <i class="bi bi-pause-fill"></i>
+            <div class="tooltip-text">Pause (k)</div>
+          </button>
+          <div class="buttons active buttons-1">
+            <button class="skip-b" onclick="skip(false)">
+              <i class="bi bi-skip-backward-fill"></i>
+            </button>
+
+            <button class="stop" onclick="stop()">
+              <i class="bi bi-stop-fill"></i>
+            </button>
+
+            <button class="skip-f" onclick="skip(true)">
+              <i class="bi bi-skip-forward-fill"></i>
+            </button>
+
+            <button class="replay tooltip" onclick="replay()">
+              <i class="bi bi-arrow-counterclockwise"></i>
+              <div class="tooltip-text">Replay (r)</div>
+            </button>
+          </div>
+
+          <div class="buttons buttons-2">
+            <div class="volume">
+              <div class="icon-container" onclick="mute()">
+                <i class="bi bi-volume-down-fill"></i>
+              </div>
+              <button class="decrease" onclick="changeVolume(false)">-</button>
+              <span class="value">0</span>
+              <button class="increase" onclick="changeVolume(true)">+</button>
+            </div>
+
+            <button class="repeat tooltip" onclick="toggleRepeat()">
+              <i class="bi bi-repeat"></i>
+              <div class="tooltip-text">Repeat off</div>
+            </button>
+
+            <button class="rate tooltip" onclick="changePlaybackRate()">
+              1x
+              <div class="tooltip-text">Playback speed</div>
+            </button>
+
+            <button class="fullscreen tooltip" onclick="toggleFullscreen()">
+              <i class="bi bi-fullscreen"></i>
+              <div class="tooltip-text">Fullscreen (f)</div>
+            </button>
+          </div>
+          <button class="switch tooltip" onclick="switchMenu()">
+            <i class="bi bi-three-dots"></i>
+            <div class="tooltip-text">Switch</div>
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-</body>
+  </body>
 </html>

@@ -1,5 +1,5 @@
 /*==================== GOOGLE FONTS ====================*/
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 
 :root {
   --primary-color: #fff;
@@ -45,18 +45,16 @@ button {
 }
 
 body {
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   background-color: var(--background-color);
   color: white;
   font-size: 0.8rem;
 }
 
-
 .container {
   max-width: 1440px;
   margin: auto;
 }
-
 
 .app {
   overflow: hidden;
@@ -66,33 +64,49 @@ body {
   flex-direction: column;
 }
 
-.app .header {
+.header {
+  background-color: var(--background-color);
   position: relative;
   z-index: 2;
-  background-color: var(--background-color);
+  display: flex;
+  flex-direction: column;
+}
+
+.header .top {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
   padding: 5px;
 }
 
-.app .title {
+.header .title {
   display: flex;
   align-items: center;
   gap: 5px;
-  margin-bottom: 8px;
 }
 
-.app .title img {
+.header .title img {
   width: 18px;
   height: 18px;
   object-fit: contain;
 }
 
-.app .menu {
+.header .menu {
   display: flex;
   gap: 10px;
+  padding: 5px;
 }
 
-.app .menu > * {
+.header .menu > * {
   font-size: 1rem;
+}
+
+.header .toggle {
+  display: none;
+  background-color: transparent;
+  color: var(--primary-color);
+  font-size: 1.5rem;
 }
 
 .media-container {
@@ -142,7 +156,13 @@ body {
   width: 100%;
 }
 
-.controls .bottom {
+.controls .options {
+  display: flex;
+  gap: 10px;
+}
+
+.controls .buttons {
+  position: relative;
   display: flex;
   gap: 10px;
 }
@@ -163,18 +183,46 @@ body {
   font-size: 1.25rem;
 }
 
-
-
+.controls .switch {
+  display: none;
+}
 
 /* Medium screens (Tablets, up to 768px wide) */
 @media (max-width: 768px) {
-  
 }
 
 /* Small screens (Phones, up to 480px wide) */
 @media (max-width: 480px) {
-  
-  .folder-input, .controls .fullscreen {
+  .header .toggle {
+    display: flex;
+  }
+
+  .header .menu {
+    position: absolute;
+    top: 100%;
     display: none;
+    flex-direction: column;
+    width: 100%;
+    background-color: var(--background-color);
+  }
+
+  .header.expanded .menu {
+    display: flex;
+  }
+
+  .controls .buttons {
+    display: none;
+  }
+
+  .controls .buttons.active {
+    display: flex;
+  }
+
+  .fullscreen {
+    display: none;
+  }
+
+  .controls .switch {
+    display: inline-block;
   }
 }
