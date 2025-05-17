@@ -106,7 +106,7 @@ body {
   display: none;
   background-color: transparent;
   color: var(--primary-color);
-  font-size: 1.5rem;
+  font-size: 1.75rem;
 }
 
 .media-container {
@@ -204,10 +204,16 @@ body {
     flex-direction: column;
     width: 100%;
     background-color: var(--background-color);
+    gap: 25px;
+    padding: 15px 5px;
   }
 
   .header.expanded .menu {
     display: flex;
+  }
+
+  .controls .options .switch {
+    margin-left: auto;
   }
 
   .controls .buttons {
