@@ -18,7 +18,7 @@
             <img src="logo.png" />
             <p>Media Player</p>
           </div>
-          <button class="toggle" onclick="toggleHeaderMenu()">
+          <button class="toggle" onclick="toggleHeader()">
             <i class="bi bi-list"></i>
           </button>
         </div>
@@ -49,7 +49,7 @@
         </div>
       </div>
 
-      <div class="media-container">
+      <div class="media-container" onclick="toggleHeader(false)">
         <img src="logo.png" class="icon" />
         <img class="cover hidden" />
         <audio id="audio-player" class="hidden"></audio>

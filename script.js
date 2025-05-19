@@ -63,7 +63,8 @@ function openFile(file, options = { useHistory: true }) {
       break;
   }
 
-  appTitle.textContent = file.name;
+  const decodedFileName = decodeURIComponent(file.name).split("/").pop();
+  appTitle.textContent = decodedFileName;
   player.classList.remove("hidden");
   player.src = url;
   player.play();
@@ -81,7 +82,8 @@ function openFile(file, options = { useHistory: true }) {
   }
 
   controls.classList.remove("hidden");
-  document.title = file.name + " - Media Player";
+  document.title = decodedFileName + " - Media Player";
+  toggleHeader(false);
 }
 
 function openFiles(files) {
@@ -322,8 +324,8 @@ function switchMenu() {
   });
 }
 
-function toggleHeaderMenu() {
-  document.querySelector(".header").classList.toggle("expanded");
+function toggleHeader(force) {
+  document.querySelector(".header").classList.toggle("expanded", force);
 }
 
 document.addEventListener("keydown", function (event) {
