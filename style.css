@@ -72,12 +72,12 @@ body {
   flex-direction: column;
 }
 
-.header .top {
+.header .main-bar {
   position: relative;
   z-index: 1;
   display: flex;
   justify-content: space-between;
-  padding: 5px;
+  padding: 5px 10px;
 }
 
 .header .title {
@@ -102,7 +102,7 @@ body {
   font-size: 1rem;
 }
 
-.header .toggle {
+.header .menu-toggle {
   display: none;
   background-color: transparent;
   color: var(--primary-color);
@@ -156,7 +156,7 @@ body {
   width: 100%;
 }
 
-.controls .options {
+.controls .control-menu {
   display: flex;
   gap: 10px;
 }
@@ -193,7 +193,12 @@ body {
 
 /* Small screens (Phones, up to 480px wide) */
 @media (max-width: 480px) {
-  .header .toggle {
+
+  .tooltip:hover .tooltip-text {
+    display: none;
+  }
+
+  .header .menu-toggle {
     display: flex;
   }
 
@@ -208,11 +213,11 @@ body {
     padding: 15px 5px;
   }
 
-  .header.expanded .menu {
+  .header .menu.expanded {
     display: flex;
   }
 
-  .controls .options .switch {
+  .controls .control-menu .switch {
     margin-left: auto;
   }
 

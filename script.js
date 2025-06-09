@@ -1,4 +1,4 @@
-const storagePrefix = "media-player_";
+const projectName = "media-player";
 
 let player = null;
 const audioPlayer = document.getElementById("audio-player");
@@ -15,13 +15,13 @@ const volumeDisplay = document.querySelector(".controls .volume .value");
 const repeatBtn = document.querySelector(".controls .repeat");
 const rateBtn = document.querySelector(".controls .rate");
 
-let volume = parseInt(localStorage.getItem(storagePrefix + "volume"));
+let currentVolume = parseInt(localStorage.getItem(`${projectName}_currentVolume`));
 let playbackRate = 1;
-if (isNaN(volume)) volume = 50;
+if (isNaN(currentVolume)) currentVolume = 50;
 
-let muted = JSON.parse(localStorage.getItem(storagePrefix + "muted")) || false;
+let muted = JSON.parse(localStorage.getItem(`${projectName}_muted`)) || false;
 let repeatEnabled = false;
-let cover = localStorage.getItem(storagePrefix + "cover") || null;
+let currentCover = localStorage.getItem(`${projectName}_currentCover`) || null;
 
 let fileType = null;
 
@@ -83,7 +83,7 @@ function openFile(file, options = { useHistory: true }) {
 
   controls.classList.remove("hidden");
   document.title = decodedFileName + " - Media Player";
-  toggleHeader(false);
+  toggleHeaderMenu(false);
 }
 
 function openFiles(files) {
@@ -157,18 +157,18 @@ function updatePauseBtn() {
 function changeVolume(isIncrease) {
   let amount = isIncrease ? 5 : -5;
 
-  if (volume <= 5 && amount < 0) amount = -1;
-  if (volume < 5 && amount > 0) amount = 1;
+  if (currentVolume <= 5 && amount < 0) amount = -1;
+  if (currentVolume < 5 && amount > 0) amount = 1;
 
-  volume = Math.min(Math.max(volume + amount, 0), 100);
+  currentVolume = Math.min(Math.max(currentVolume + amount, 0), 100);
 
-  if (player) player.volume = volume / 100;
-  localStorage.setItem(storagePrefix + "volume", volume.toString());
+  if (player) player.volume = currentVolume / 100;
+  localStorage.setItem(`${projectName}_currentVolume`, currentVolume.toString());
   updateVolumeDisplay();
 }
 
 function updateVolumeDisplay() {
-  volumeDisplay.textContent = volume;
+  volumeDisplay.textContent = currentVolume;
 
   let icon = muted ? `<i class="bi bi-volume-mute-fill"></i>` : `<i class="bi bi-volume-down-fill"></i>`;
   document.querySelector(".controls .volume .icon-container").innerHTML = icon;
@@ -178,7 +178,7 @@ function mute() {
   muted = !muted;
   if (player) player.muted = muted;
 
-  localStorage.setItem(storagePrefix + "muted", muted.toString());
+  localStorage.setItem(`${projectName}_muted`, muted.toString());
 
   updateVolumeDisplay();
 }
@@ -249,34 +249,30 @@ function changePlaybackRate() {
   `;
 }
 
-function readFile(file) {
+function getFileDataUrl(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
-    reader.onload = function (e) {
-      resolve(e.target.result);
-    };
-
-    reader.onerror = function (error) {
-      reject(error);
-    };
-
+    reader.onload = (e) => resolve(e.target.result);
+    reader.onerror = (error) => reject(error);
     reader.readAsDataURL(file);
   });
 }
 
-async function updateCover(file) {
-  const url = file ? await readFile(file) : cover;
+async function changeCover(file) {
+  const dataUrl = file ? await getFileDataUrl(file) : currentCover;
 
-  if (url) {
-    coverEl.classList.remove("hidden");
-    coverEl.src = url;
-  } else {
-    coverEl.src = "";
-    coverEl.classList.add("hidden");
-  }
+  if (!dataUrl) return;
+  if (dataUrl === currentCover) return;
 
-  if (url && url !== cover) localStorage.setItem(storagePrefix + "cover", url);
+  currentCover = dataUrl;
+  localStorage.setItem(`${projectName}_currentCover`, dataUrl);
+  displayCover();
+}
+
+function displayCover() {
+  coverEl.src = currentCover || "";
+  coverEl.classList.toggle("hidden", !currentCover);
 }
 
 function toggleFullscreen() {
@@ -316,7 +312,7 @@ function animation() {
   coverEl.style.transform = `translate(${x}%, ${y}%) scale(${scale})`;
 }
 
-function switchMenu() {
+function switchControlMenu() {
   const buttonsEl = document.querySelectorAll(".controls .buttons");
 
   buttonsEl.forEach((el) => {
@@ -324,8 +320,8 @@ function switchMenu() {
   });
 }
 
-function toggleHeader(force) {
-  document.querySelector(".header").classList.toggle("expanded", force);
+function toggleHeaderMenu(force) {
+  document.querySelector(".header .menu").classList.toggle("expanded", force);
 }
 
 document.addEventListener("keydown", function (event) {
@@ -346,7 +342,7 @@ document.addEventListener("keydown", function (event) {
 
 players.forEach((player) => {
   player.addEventListener("loadedmetadata", function () {
-    player.volume = volume / 100;
+    player.volume = currentVolume / 100;
     player.muted = muted;
     player.playbackRate = playbackRate;
     updateVolumeDisplay();
@@ -376,7 +372,7 @@ players.forEach((player) => {
 
 document.addEventListener("DOMContentLoaded", function () {
   updateVolumeDisplay();
-  updateCover();
+  displayCover();
 });
 
 window.addEventListener("error", (event) => {

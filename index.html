@@ -13,12 +13,12 @@
   <body>
     <div class="app container">
       <div class="header">
-        <div class="top">
+        <div class="main-bar">
           <div class="title">
             <img src="logo.png" />
             <p>Media Player</p>
           </div>
-          <button class="toggle" onclick="toggleHeader()">
+          <button class="menu-toggle" onclick="toggleHeaderMenu()">
             <i class="bi bi-list"></i>
           </button>
         </div>
@@ -44,12 +44,12 @@
           <label class="background-input">
             <i class="bi bi-image"></i>
             Cover
-            <input type="file" accept="image/*" class="hidden" oninput="updateCover(this.files[0])" />
+            <input type="file" accept="image/*" class="hidden" oninput="changeCover(event.target.files[0])" />
           </label>
         </div>
       </div>
 
-      <div class="media-container" onclick="toggleHeader(false)">
+      <div class="media-container" onclick="toggleHeaderMenu(false)">
         <img src="logo.png" class="icon" />
         <img class="cover hidden" />
         <audio id="audio-player" class="hidden"></audio>
@@ -60,7 +60,7 @@
         <div class="progress-bar">
           <input type="range" class="slider" oninput="seekTo(this.value)" onchange="updatePauseBtn()" value="0" />
         </div>
-        <div class="options">
+        <div class="control-menu">
           <button class="pause tooltip" onclick="pause()">
             <i class="bi bi-pause-fill"></i>
             <div class="tooltip-text">Pause (k)</div>
@@ -109,7 +109,7 @@
               <div class="tooltip-text">Fullscreen (f)</div>
             </button>
           </div>
-          <button class="switch tooltip" onclick="switchMenu()">
+          <button class="switch" onclick="switchControlMenu()">
             <i class="bi bi-three-dots"></i>
             <div class="tooltip-text">Switch</div>
           </button>
