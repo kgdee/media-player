@@ -111,6 +111,7 @@ body {
 
 .media-container {
   position: relative;
+  min-height: 0;
   flex: 1;
   display: flex;
   justify-content: center;
@@ -119,6 +120,8 @@ body {
 
 .media-container > * {
   position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 .media-container .icon {
@@ -127,14 +130,13 @@ body {
   top: 50%;
   transform: translate(-50%, -50%);
   width: 64px;
+  height: auto;
 }
 
 .media-container .cover {
   position: absolute;
   left: 0;
   top: 0;
-  width: 100%;
-  height: 100%;
   object-fit: cover;
   object-position: center;
   transition: 1s;

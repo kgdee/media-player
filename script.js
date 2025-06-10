@@ -15,73 +15,43 @@ const volumeDisplay = document.querySelector(".controls .volume .value");
 const repeatBtn = document.querySelector(".controls .repeat");
 const rateBtn = document.querySelector(".controls .rate");
 
-let currentVolume = parseInt(localStorage.getItem(`${projectName}_currentVolume`));
+let currentVolume = parseInt(localStorage.getItem(`${projectName}_currentVolume`)) || 50;
 let playbackRate = 1;
-if (isNaN(currentVolume)) currentVolume = 50;
 
 let muted = JSON.parse(localStorage.getItem(`${projectName}_muted`)) || false;
 let repeatEnabled = false;
 let currentCover = localStorage.getItem(`${projectName}_currentCover`) || null;
 
-let fileType = null;
-
 let currentFiles = [];
-let currentFile = null;
-let availableFiles = [];
-let historyFiles = [];
-let backwardCount = 0;
+let shuffledIndexes = [];
+let currentIndex = -1;
 
 let animationInterval = null;
-let animated = false;
-
 let repeatTimeout = null;
 
-function openFile(file, options = { useHistory: true }) {
+function openFile(file) {
   if (!file) return;
+  if (!isAudio(file) && !isVideo(file)) return;
 
-  const fileMatch = currentFiles.some((item) => item.name === file.name);
-  if (fileMatch) file = currentFiles[currentFiles.findIndex((item) => item.name === file.name)];
-
-  fileType = file.type.split("/")[0];
-
-  if (fileType != "audio" && fileType != "video") return;
-
-  const url = URL.createObjectURL(file);
+  const dataUrl = URL.createObjectURL(file);
 
   if (player) player.pause();
 
-  switch (fileType) {
-    case "audio":
-      player = audioPlayer;
-      videoPlayer.classList.add("hidden");
-      break;
-    case "video":
-      player = videoPlayer;
-      audioPlayer.classList.add("hidden");
-      break;
-    default:
-      break;
+  if (isAudio(file)) {
+    player = audioPlayer;
+    videoPlayer.classList.add("hidden");
+  } else if (isVideo(file)) {
+    player = videoPlayer;
+    audioPlayer.classList.add("hidden");
   }
 
   const decodedFileName = decodeURIComponent(file.name).split("/").pop();
   appTitle.textContent = decodedFileName;
   player.classList.remove("hidden");
-  player.src = url;
+  player.src = dataUrl;
   player.play();
 
-  const fileIndex = currentFiles.indexOf(file);
-  currentFile = fileIndex;
-
-  if (options.useHistory) {
-    if (historyFiles.length > 0 && backwardCount > 0) historyFiles.splice(historyFiles.length - backwardCount, 0, fileIndex);
-    else historyFiles.push(fileIndex);
-  }
-
-  if (fileMatch) {
-    if (availableFiles.includes(fileIndex)) availableFiles.splice(availableFiles.indexOf(fileIndex), 1);
-  }
-
-  controls.classList.remove("hidden");
+  coverEl.classList.toggle("hidden", isVideo(file))
   document.title = decodedFileName + " - Media Player";
   toggleHeaderMenu(false);
 }
@@ -90,27 +60,45 @@ function openFiles(files) {
   if (!files) return;
   if (files.length <= 0) return;
 
-  if (files.length <= 1) {
-    openFile(files[0]);
-    return;
-  }
+  currentFiles = files;
 
-  currentFiles = [...files];
+  shuffledIndexes = shuffle([...Array(currentFiles.length).keys()]);
 
-  openRandomFile();
+  openNext();
 }
 
-function openRandomFile() {
-  if (!currentFiles) return;
+function openNext() {
+  if (currentIndex < shuffledIndexes.length - 1) {
+    currentIndex++;
+    openFile(currentFiles[shuffledIndexes[currentIndex]]);
+  }
+}
 
-  backwardCount = 0;
+function openPrev() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    openFile(currentFiles[shuffledIndexes[currentIndex]]);
+  }
+}
 
-  if (availableFiles.length <= 0) availableFiles = Array.from({ length: currentFiles.length }, (_, index) => index);
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
 
-  const fileIndex = availableFiles[Math.floor(Math.random() * availableFiles.length)];
-  const file = currentFiles[fileIndex];
+function isAudio(file) {
+  const audioTypes = ["audio/mpeg", "audio/wav", "audio/ogg", "audio/mp3", "audio/webm"];
 
-  openFile(file);
+  return audioTypes.includes(file.type);
+}
+
+function isVideo(file) {
+  const videoTypes = ["video/mp4", "video/webm", "video/ogg", "video/avi", "video/mov"];
+
+  return videoTypes.includes(file.type);
 }
 
 function pause() {
@@ -192,31 +180,6 @@ function toggleRepeat() {
   `;
 }
 
-function skip(forward = true) {
-  let file = null;
-  if (forward) {
-    if (backwardCount > 0) {
-      backwardCount--;
-      file = currentFiles[historyFiles[historyFiles.length - backwardCount - 1]];
-    } else {
-      backwardCount = 0;
-      openRandomFile();
-      return;
-    }
-  } else if (historyFiles.length > backwardCount + 1) {
-    backwardCount++;
-    file = currentFiles[historyFiles[historyFiles.length - backwardCount - 1]];
-  } else {
-    // console.log("minimum limit!")
-  }
-
-  // console.log(backwardCount)
-
-  const useHistory = backwardCount <= 0 && historyFiles[historyFiles.length - 1] !== currentFiles.indexOf(file);
-
-  openFile(file, { useHistory: useHistory });
-}
-
 function stop() {
   if (!player) return;
 
@@ -294,13 +257,11 @@ function cancelRepeat() {
 }
 
 function startAnimation() {
-  animated = true;
   clearInterval(animationInterval);
   animationInterval = setInterval(animation, 500);
 }
 
 function stopAnimation() {
-  animated = false;
   clearInterval(animationInterval);
 }
 
@@ -363,7 +324,7 @@ players.forEach((player) => {
 
   player.addEventListener("ended", () => {
     if (!repeatEnabled) {
-      currentFiles.length > 1 ? openRandomFile() : updatePauseBtn();
+      currentIndex < shuffledIndexes.length - 1 ? openNext() : updatePauseBtn();
     } else {
       repeat();
     }
